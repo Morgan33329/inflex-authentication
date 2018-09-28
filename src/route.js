@@ -1,7 +1,8 @@
 import {
     authMiddleware
-} from "./authentication";
+} from './authentication';
 
+// Login
 var loginSuccess = function (req, res) {
     req
         .token()
@@ -10,71 +11,70 @@ var loginSuccess = function (req, res) {
             ret.disable.exceptMe();
 
             res.json({
-                "error" : false,
-                "response" : {
-                    "token" : ret.token
+                'error' : false,
+                'response' : {
+                    'token' : ret.token
                 }
             });
         })
         .catch(err => { 
             console.log(err);
 
-            res.send("fail doJWTLogin");
+            res.send('fail doJWTLogin');
         });
 }
 
-export function loginRoute (app, action) {
+export function loginRoute (app, options) {
     app.post(
-        "/api/login", 
+        '/api/login', 
         authMiddleware('auth.api'), 
-        action || loginSuccess
+        options.action || loginSuccess
     );
 }
 
-
+// Refresh token
 var refreshToken = function (req, res) {
     req
         .token()
         .refresh(req.headers.authorization, req.body.refresh_token)
         .then(token => {
             res.json({
-                "error" : false,
-                "response" : {
-                    "token" : token
+                'error' : false,
+                'response' : {
+                    'token' : token
                 }
             });
         })
         .catch(err => { 
             console.log(err);
 
-            res.send("fail doJWTLogin");
+            res.send('fail doJWTLogin');
         });
 }
 
-export function refreshTokenRoute (app, action) {
+export function refreshTokenRoute (app, options) {
     app.post(
-        "/api/refresh_token", 
+        '/api/refresh_token', 
         authMiddleware('defend.jwt', {
-            "check_expire" : false
+            'check_expire' : false
         }), 
-        action || refreshToken
+        options.action || refreshToken
     );
 }
 
-
+//Logout
 var logout = function (req, res) {
     req.logout();
 
     res.json({
-        "error" : false
+        'error' : false
     });
 }
 
-
-export function logoutRoute (app, action) {
+export function logoutRoute (app, options) {
     app.get(
-        "/api/logout", 
+        '/api/logout', 
         authMiddleware('defend.jwt'), 
-        action || logout
+        options.action || logout
     );
 }

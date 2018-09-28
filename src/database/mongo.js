@@ -22,7 +22,7 @@ class Mongo {
             process.exit();
         }
 
-        this.connect(cnf.host)
+        this.connect(cnf.host);
     }
 
     getType () {
@@ -34,7 +34,9 @@ class Mongo {
     }
 
     connect(host) {
-        mongoose.connect(host);
+        mongoose.connect(host, { 
+            useNewUrlParser: true 
+        });
     }
 
     repository (type) {

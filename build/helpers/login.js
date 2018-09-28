@@ -13,6 +13,8 @@ var _bcrypt2 = _interopRequireDefault(_bcrypt);
 
 var _check = require('express-validator/check');
 
+var _authentication = require('./../authentication');
+
 var _database = require('./../database');
 
 var _database2 = _interopRequireDefault(_database);
@@ -20,6 +22,10 @@ var _database2 = _interopRequireDefault(_database);
 var _logout = require('./../services/logout');
 
 var _logout2 = _interopRequireDefault(_logout);
+
+var _device = require('./../services/device/device');
+
+var _device2 = _interopRequireDefault(_device);
 
 var _token = require('./../helpers/token');
 
@@ -43,13 +49,16 @@ var validateToArray = function validateToArray(ret, data) {
     return ret;
 };
 
-function appendInputValidation(middlewares, settings) {
-    var inputs = settings.validateInputs;
+function appendInputValidation(middleware, settings) {
+    var inputs = (0, _authentication.authConfig)('validateInputs');
 
-    middlewares = validateToArray(middlewares, inputs.username((0, _check.check)(settings.usernameField)));
-    middlewares = validateToArray(middlewares, inputs.password((0, _check.check)(settings.passwordField)));
+    middleware = validateToArray(middleware, function (req, res, next) {
+        if (!req.body.username) settings.invalidRequest(req, res, ['username'], settings);else next();
+    });
 
-    middlewares.push(function (req, res, next) {
+    middleware = validateToArray(middleware, inputs.password((0, _check.check)(settings.passwordField)));
+
+    middleware.push(function (req, res, next) {
         var errors = (0, _check.validationResult)(req);
 
         if (!errors.isEmpty()) {
@@ -59,12 +68,10 @@ function appendInputValidation(middlewares, settings) {
         } else next();
     });
 
-    return middlewares;
+    return middleware;
 }
 
 function byUsernameAndPassword(username, password, done) {
-    var self = this;
-
     (0, _database2.default)().repository('account').findByAccount(username).then(function (account) {
         if (account) {
             console.log('Account found' + account.identity_id);
@@ -109,35 +116,41 @@ function byUsernameAndPassword(username, password, done) {
 }
 
 function successLoginInMiddleware(account, req, next, settings) {
-    req.logIn(account, {
-        "session": settings && settings.session ? settings.session : false
-    }, function (err) {
-        if (err) {
-            return next(err);
-        }
-        //Duplikálva a defender/jwt.jsbe
-        req.token = function (type) {
-            type = type || "jwt";
+    var deviceService = new _device2.default();
 
-            var generator = (0, _token2.default)(type);
+    deviceService.user(account).create(req.body.device || {}).then(function (device) {
+        account.device = device;
 
-            if (generator) {
-                generator.user(account);
-
-                return generator;
-            } else {
-                process.exit(1);
+        req.logIn(account, {
+            "session": settings && settings.session ? settings.session : false
+        }, function (err) {
+            if (err) {
+                return next(err);
             }
-        };
+            //Duplikálva a defender/jwt.jsbe
+            req.token = function (type) {
+                type = type || "jwt";
 
-        req.logout = function () {
-            var lo = new _logout2.default();
+                var generator = (0, _token2.default)(type);
 
-            lo.user(account);
+                if (generator) {
+                    generator.user(account);
 
-            lo.logout();
-        };
+                    return generator;
+                } else {
+                    process.exit(1);
+                }
+            };
 
-        next();
+            req.logout = function () {
+                var lo = new _logout2.default();
+
+                lo.user(account);
+
+                lo.logout();
+            };
+
+            next();
+        });
     });
 }

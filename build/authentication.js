@@ -15,11 +15,11 @@ var _passport = require('passport');
 
 var _passport2 = _interopRequireDefault(_passport);
 
-var _loginWithApi = require('./middlewares/login-with-api');
+var _loginWithApi = require('./middleware/login-with-api');
 
 var _loginWithApi2 = _interopRequireDefault(_loginWithApi);
 
-var _defendWithJwt = require('./middlewares/defend-with-jwt');
+var _defendWithJwt = require('./middleware/defend-with-jwt');
 
 var _defendWithJwt2 = _interopRequireDefault(_defendWithJwt);
 
@@ -38,7 +38,6 @@ function authConfig(configOrKey) {
     if (type === 'string') {
         return (0, _config.getConfig)(configOrKey);
     } else if (type === 'object') {
-        console.log(type);
         (0, _config.setConfig)(configOrKey);
     }
 }
@@ -62,19 +61,21 @@ function authExpress(app) {
 /**
  * Create default routes for login if we are lazy
  */
-function authRoutes(app) {
-    (0, _route.loginRoute)(app);
+function authRoutes(app, options) {
+    options = options || {};
 
-    (0, _route.logoutRoute)(app);
+    (0, _route.loginRoute)(app, options.login || {});
 
-    (0, _route.refreshTokenRoute)(app);
+    (0, _route.logoutRoute)(app, options.logout || {});
+
+    (0, _route.refreshTokenRoute)(app, options.refreshToken || {});
 }
 
-function authMiddleware(type) {
-    var middlewares = {
-        'auth.api': (0, _loginWithApi2.default)(),
-        'defend.jwt': (0, _defendWithJwt2.default)()
-    };
-
-    return middlewares[type];
+function authMiddleware(type, options, middleware) {
+    switch (type) {
+        case 'auth.api':
+            return (0, _loginWithApi2.default)(options, middleware);
+        case 'defend.jwt':
+            return (0, _defendWithJwt2.default)(options, middleware);
+    }
 }

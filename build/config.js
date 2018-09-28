@@ -21,9 +21,16 @@ var _os2 = _interopRequireDefault(_os);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var defaultSettings = {
-    'loginUrl': '/login',
-
     'host': _os2.default.hostname(),
+
+    'validateInputs': {
+        'email': function email(check) {
+            return check.isEmail();
+        },
+        'password': function password(check) {
+            return check.isMD5();
+        }
+    },
 
     'loginWith': {
         'email': 1

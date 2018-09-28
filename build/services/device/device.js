@@ -23,11 +23,15 @@ var _class = function () {
         key: 'user',
         value: function user(_user) {
             this.userObject = _user;
+
+            return this;
         }
     }, {
         key: 'device',
         value: function device(_device) {
             this.device = _device;
+
+            return this;
         }
     }, {
         key: 'create',
@@ -70,7 +74,9 @@ var _class = function () {
             var update = {},
                 deviceId = (0, _database2.default)().getId(this.device);
 
-            if (options.type) update.device_type = options['type'];
+            if (options.type) {
+                if (options.type == 1 || options.type == 'ios') update.device_type = 1;else if (options.type == 2 || options.type == 'android') update.device_type = 1;
+            }
 
             if (options.push) update.device_push = options['push'];
 

@@ -21,7 +21,7 @@ export function authConfig (configOrKey) {
 
     if (type === 'string') {
         return getConfig(configOrKey);
-    } else if (type === 'object') { console.log(type);
+    } else if (type === 'object') {
         setConfig(configOrKey);
     }
 }
@@ -45,12 +45,14 @@ export function authExpress (app) {
 /**
  * Create default routes for login if we are lazy
  */
-export function authRoutes (app) {
-    loginRoute(app);
+export function authRoutes (app, options) {
+    options = options || {};
 
-    logoutRoute(app);
+    loginRoute(app, options.login || {});
 
-    refreshTokenRoute(app);
+    logoutRoute(app, options.logout || {});
+
+    refreshTokenRoute(app, options.refreshToken || {});
 }
 
 export function authMiddleware (type, options, middleware) {

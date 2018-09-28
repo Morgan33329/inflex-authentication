@@ -39,7 +39,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var tokenType = 'bearer';
 
 var Token = function () {
-    function Token(id, x, y) {
+    function Token() {
         _classCallCheck(this, Token);
 
         this.deviceService = new _device2.default();
@@ -132,8 +132,7 @@ function generateJsonWebToken(jwtContent, device) {
 
     return (0, _database2.default)().repository('device').update(deviceId, {
         "refresh_token": refreshToken,
-        "disabled": false,
-        "device_push": "alma"
+        "disabled": false
     }).then(function (device) {
         console.log("Token generated");
 

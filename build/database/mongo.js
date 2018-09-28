@@ -32,6 +32,10 @@ var _password = require('./mongo/repositories/password');
 
 var _password2 = _interopRequireDefault(_password);
 
+var _social = require('./mongo/repositories/social');
+
+var _social2 = _interopRequireDefault(_social);
+
 var _account3 = require('./mongo/models/account');
 
 var _account4 = _interopRequireDefault(_account3);
@@ -51,6 +55,10 @@ var _hash2 = _interopRequireDefault(_hash);
 var _password3 = require('./mongo/models/password');
 
 var _password4 = _interopRequireDefault(_password3);
+
+var _social3 = require('./mongo/models/social');
+
+var _social4 = _interopRequireDefault(_social3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -86,7 +94,9 @@ var Mongo = function () {
     }, {
         key: 'connect',
         value: function connect(host) {
-            _mongoose2.default.connect(host);
+            _mongoose2.default.connect(host, {
+                useNewUrlParser: true
+            });
         }
     }, {
         key: 'repository',
@@ -100,6 +110,8 @@ var Mongo = function () {
                     return (0, _identity2.default)();
                 case 'password':
                     return (0, _password2.default)();
+                case 'social':
+                    return (0, _social2.default)();
             }
         }
     }, {
@@ -116,6 +128,8 @@ var Mongo = function () {
                     return _password4.default;
                 case 'hash':
                     return _hash2.default;
+                case 'social':
+                    return _social4.default;
                 default:
                     console.log("Model type " + _model + " not found");
             }

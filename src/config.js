@@ -3,8 +3,6 @@ import database from './database';
 import os from 'os';
 
 const defaultSettings = {
-    'loginUrl' : '/login',
-
     'host' : os.hostname(),
     
     'validateInputs' : {
