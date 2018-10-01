@@ -1,7 +1,7 @@
 {
   "name": "inflex-authentication",
   "main": "./authentication.js",
-  "version": "0.0.21",
+  "version": "0.0.30",
   "author": {
     "name": "Morgan",
     "email": "morgan92333@gmail.com",
@@ -33,7 +33,7 @@
     "babel-preset-stage-2": "^6.24.1"
   },
   "engines": {},
-  "homepage": "https://github.com/morgan92333/inflex-authentication",
+  "homepage": "https://github.com/morgan92333",
   "keywords": [
     "passport",
     "authentication"
