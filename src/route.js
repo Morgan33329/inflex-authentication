@@ -24,9 +24,13 @@ var refreshToken = function (req, res) {
             });
         })
         .catch(err => { 
-            console.log(err);
-
-            res.send('fail doJWTLogin');
+            return res.status(422).json({ 
+                'error' : true,
+                "code" : '4220103',
+                "type" : '',
+                "title" : 'Invalid refresh token',
+                "detail" : 'Invalid refresh token: ' + req.body.refresh_token
+            });
         });
 }
 

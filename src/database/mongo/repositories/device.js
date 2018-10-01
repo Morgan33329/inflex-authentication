@@ -56,7 +56,7 @@ class DeviceRepository {
             Device
                 .updateMany({
                     "$and": [
-                        { 'id' : { "$ne": device.id } },
+                        { '_id' : { "$ne": database().getId(device) } },
                         { 'identity_id' : device.identity_id }
                     ]
                 }, {
