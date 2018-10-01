@@ -6,10 +6,10 @@ const defaultSettings = {
     'host' : os.hostname(),
     
     'validateInputs' : {
-        'email' : function(check) {
+        'email' : (check) => {
             return check.isEmail();
         },
-        'password' : function(check) {
+        'password' : (check) => {
             return check.isMD5();
         }
     },
@@ -28,6 +28,35 @@ const defaultSettings = {
             'user' : process.env.MAIL_USERNAME || '',
             'pass' : process.env.MAIL_PASSWORD || ''
         }
+    },
+
+    'actions' : {
+        'login' : (req, res) => {
+            req
+                .token()
+                .generate(req.body.device)
+                .then((ret) => {
+                    ret.disable.exceptMe();
+        
+                    res.json({
+                        "error" : false,
+                        "response" : {
+                            "token" : ret.token
+                        }
+                    });
+                })
+                .catch(err => { 
+                    console.log(err);
+        
+                    res.send("fail doJWTLogin");
+                });
+        }
+    },
+
+    'middleware' : {
+        'registration' : null,
+
+        'token' : null
     }
 };
 var settings = defaultSettings;
@@ -50,4 +79,8 @@ export function setConfig (cnf) {
 
 export function getConfig (key) {
     return _.get(settings, key);
+}
+
+export function changeConfig (key, value) {
+    _.set(settings, key, value);
 }

@@ -1,34 +1,12 @@
-import {
-    authMiddleware
-} from './authentication';
+import { getConfig } from './config';
+import { authMiddleware } from './authentication';
 
 // Login
-var loginSuccess = function (req, res) {
-    req
-        .token()
-        .generate(req.body.device)
-        .then((ret) => {
-            ret.disable.exceptMe();
-
-            res.json({
-                'error' : false,
-                'response' : {
-                    'token' : ret.token
-                }
-            });
-        })
-        .catch(err => { 
-            console.log(err);
-
-            res.send('fail doJWTLogin');
-        });
-}
-
 export function loginRoute (app, options) {
     app.post(
         '/api/login', 
         authMiddleware('auth.api'), 
-        options.action || loginSuccess
+        options.action || getConfig('actions.login')
     );
 }
 

@@ -10,7 +10,8 @@ import {
 } from './route';
 import {
     getConfig,
-    setConfig
+    setConfig,
+    changeConfig
 } from './config';
 
 /**
@@ -24,6 +25,14 @@ export function authConfig (configOrKey) {
     } else if (type === 'object') {
         setConfig(configOrKey);
     }
+}
+
+export function addAction (type, action) {
+    changeConfig('actions.' + type, action);
+}
+
+export function addMiddleware (type, middleware) {
+    changeConfig('middleware.' + type, middleware);
 }
 
 /**

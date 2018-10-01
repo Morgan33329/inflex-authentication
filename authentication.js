@@ -6,6 +6,10 @@ const authentication = require('./' + dir + '/authentication');
 
 exports.authConfig = authentication.authConfig;
 
+exports.addAction = authentication.addAction;
+
+exports.addMiddleware = authentication.addMiddleware;
+
 exports.authExpress = authentication.authExpress;
 
 exports.authRoutes = authentication.authRoutes;

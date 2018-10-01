@@ -7,9 +7,10 @@ import {
 } from 'passport-jwt';
 import _ from 'lodash';
 
+import { getConfig } from './../config';
 import logout from './../services/logout';
 import database from './../database';
-import {createObject} from './../helpers/user'
+import { createObject } from './../helpers/user'
 import tokenGenerators from './../helpers/token';
 
 const doJwtSettings = {
@@ -79,6 +80,15 @@ function defineStrategy(settings) {
     }));
 };
 
+var hasToken = function(req, res, next) {
+    let tokenMiddle = getConfig('middleware.token');
+
+    if (tokenMiddle)
+        tokenMiddle(req, res);
+
+    next();
+}
+
 export default function (settings, middleware) {
     middleware = middleware || [];
 
@@ -87,7 +97,9 @@ export default function (settings, middleware) {
     defineStrategy(settings);
 
     middleware.push(
-        passport.authenticate('jwt', { session: false })
+        passport.authenticate('jwt', { session: false }),
+
+        hasToken
     );
 
     middleware.push(
