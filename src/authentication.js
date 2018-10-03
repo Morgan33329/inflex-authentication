@@ -27,12 +27,26 @@ export function authConfig (configOrKey) {
     }
 }
 
-export function addAction (type, action) {
-    changeConfig('actions.' + type, action);
+export function addAction (type, version, action) {
+    if (!action && typeof version === 'function') {
+        action  = version;
+        version = 'default';
+    }
+
+    version = version.replace('.', '_');
+
+    changeConfig(version + '.actions.' + type, action);
 }
 
-export function addMiddleware (type, middleware) {
-    changeConfig('middleware.' + type, middleware);
+export function addMiddleware (type, version, middleware) {
+    if (!middleware && typeof version === 'function') {
+        middleware = version;
+        version    = 'default';
+    }
+
+    version = version.replace('.', '_');
+    
+    changeConfig(version + '.middleware.' + type, middleware);
 }
 
 /**
@@ -54,14 +68,20 @@ export function authExpress (app) {
 /**
  * Create default routes for login if we are lazy
  */
-export function authRoutes (app, options) {
+export function authRoutes (app, version, options = null) {
+    if (typeof version === 'object' && !options) {
+        options = version;
+        version = null;
+    }
+
+    version = version || '';
     options = options || {};
 
-    loginRoute(app, options.login || {});
+    loginRoute(app, options.login || {}, version);
 
-    logoutRoute(app, options.logout || {});
+    logoutRoute(app, options.logout || {}, version);
 
-    refreshTokenRoute(app, options.refreshToken || {});
+    refreshTokenRoute(app, options.refreshToken || {}, version);
 }
 
 export function authMiddleware (type, options, middleware) {

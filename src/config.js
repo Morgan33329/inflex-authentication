@@ -30,33 +30,29 @@ const defaultSettings = {
         }
     },
 
-    'actions' : {
-        'login' : (req, res) => {
-            req
-                .token()
-                .generate(req.body.device)
-                .then((ret) => {
-                    ret.disable.exceptMe();
-        
-                    res.json({
-                        "error" : false,
-                        "response" : {
-                            "token" : ret.token
-                        }
+    'default' : {
+        'actions' : {
+            'login' : (req, res) => {
+                req
+                    .token()
+                    .generate(req.body.device)
+                    .then((ret) => {
+                        ret.disable.exceptMe();
+            
+                        res.json({
+                            "error" : false,
+                            "response" : {
+                                "token" : ret.token
+                            }
+                        });
+                    })
+                    .catch(err => { 
+                        console.log(err);
+            
+                        res.send("fail doJWTLogin");
                     });
-                })
-                .catch(err => { 
-                    console.log(err);
-        
-                    res.send("fail doJWTLogin");
-                });
+            }
         }
-    },
-
-    'middleware' : {
-        'registration' : null,
-
-        'token' : null
     }
 };
 var settings = defaultSettings;
