@@ -5,7 +5,7 @@ import { authMiddleware } from './authentication';
 export function loginRoute (app, options, version) {
     app.post(
         (version ? '/' + version : '') + '/api/login', 
-        authMiddleware('auth.api'), 
+        authMiddleware('auth.api', {}, options.middleware), 
         (req, res, next) => {
             routeAction('login', version, options.action)(req, res, next);
         }
@@ -41,7 +41,7 @@ export function refreshTokenRoute (app, options, version) {
         (version ? '/' + version : '') + '/api/refresh_token', 
         authMiddleware('defend.jwt', {
             'check_expire' : false
-        }), 
+        }, options.middleware), 
         options.action || refreshToken
     );
 }
@@ -58,7 +58,7 @@ var logout = function (req, res) {
 export function logoutRoute (app, options, version) {
     app.get(
         (version ? '/' + version : '') + '/api/logout', 
-        authMiddleware('defend.jwt'), 
+        authMiddleware('defend.jwt', {}, options.middleware), 
         options.action || logout
     );
 }

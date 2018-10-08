@@ -1,12 +1,12 @@
 import _ from 'lodash';
 import passport from 'passport';
-import { Strategy } from "passport-local";
+import { Strategy } from 'passport-local';
 
 import {
     byUsernameAndPassword,
     appendInputValidation,
     successLoginInMiddleware
-} from "./../helpers/login";
+} from './../helpers/login';
 
 const doLoginSettings = {
     'usernameField' : 'username',
@@ -16,21 +16,25 @@ const doLoginSettings = {
 
     'invalidAuthenticate' : function(res) {
         return res.status(401).json({ 
-            'error' : true,
-            "code" : '4010101',
-            "type" : '',
-            "title" : 'Invalid username or password',
-            "detail" : 'Invalid username or password'
+            'success' : false,
+            'error' : {
+                'code' : '4010101',
+                'type' : '',
+                'title' : 'Invalid username or password',
+                'detail' : 'Invalid username or password'
+            }
         });
     },
 
     'invalidRequest' : function(req, res, errors) {
         return res.status(422).json({ 
-            'error' : true,
-            "code" : '4220102',
-            "type" : '',
-            "title" : 'Invalid authorization request',
-            "detail" : 'Invalid authorization request: ' + JSON.stringify(errors)
+            'success' : false,
+            'error' : {
+                'code' : '4220102',
+                'type' : '',
+                'title' : 'Invalid authorization request',
+                'detail' : 'Invalid authorization request: ' + JSON.stringify(errors)
+            }
         });
     }
 };
@@ -51,7 +55,7 @@ export default function (settings, middleware) {
     settings = _.merge(doLoginSettings, settings);
 
     let ret = middleware || [];
-    
+
     defineStrategy(settings);
 
     ret = appendInputValidation(ret, settings);
@@ -60,15 +64,15 @@ export default function (settings, middleware) {
         function (req, res, next) {
             return passport.authenticate('local', function(err, account) {
                 if (!err && account) {
-                    console.log("Authentication success");
+                    console.log('Authentication success');
 
                     successLoginInMiddleware(account, req, next, settings);
                 } else if (err) {
-                    console.log("Error: passport authenticate error");
+                    console.log('Error: passport authenticate error');
 
                     next(err);
                 } else {
-                    console.log("Authentication failed");
+                    console.log('Authentication failed');
 
                     settings.invalidAuthenticate(res);
                 }
