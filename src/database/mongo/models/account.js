@@ -19,4 +19,4 @@ accountSchema.pre('save', function(next) {
     next();
 });
 
-export default mongoose.model('user_account', accountSchema);
+export default mongoose.model('auth_account', accountSchema);

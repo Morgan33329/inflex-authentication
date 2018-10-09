@@ -1,7 +1,7 @@
 {
   "name": "inflex-authentication",
   "main": "./authentication.js",
-  "version": "0.0.34",
+  "version": "0.0.37",
   "author": {
     "name": "Morgan",
     "email": "morgan92333@gmail.com",
@@ -49,6 +49,8 @@
     "url": ""
   },
   "scripts": {
+    "only-dev": "npm install --only=dev",
+    "publish": "npm run build && npm publish",
     "watch-node": "nodemon --exec babel-node --presets env,stage-2 examples/simple-config.js",
     "build": "babel src --out-dir lib"
   }

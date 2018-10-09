@@ -29,4 +29,4 @@ deviceSchema.pre('save', function(next) {
     next();
 });
 
-export default mongoose.model('user_device', deviceSchema);
+export default mongoose.model('auth_device', deviceSchema);

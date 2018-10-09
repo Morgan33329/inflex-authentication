@@ -34,4 +34,4 @@ identitySchema.pre('save', function(next) {
     next();
 });
 
-export default mongoose.model('user_identity', identitySchema);
+export default mongoose.model('auth_identity', identitySchema);

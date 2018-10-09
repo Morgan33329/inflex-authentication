@@ -19,4 +19,4 @@ socialSchema.pre('save', function(next) {
     next();
 });
 
-export default mongoose.model('user_social', socialSchema);
+export default mongoose.model('auth_social', socialSchema);

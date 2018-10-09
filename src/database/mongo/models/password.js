@@ -19,4 +19,4 @@ passwordSchema.pre('save', function(next) {
     next();
 });
 
-export default mongoose.model('user_password', passwordSchema);
+export default mongoose.model('auth_password', passwordSchema);
