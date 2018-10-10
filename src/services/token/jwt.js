@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
+import { getConfig } from './../../config';
 import database from './../../database';
 import {
     getAuthKeys
@@ -15,6 +16,8 @@ var tokenType = 'bearer';
 export default class Token {
     constructor () {
         this.deviceService = new DeviceService();
+
+        this.log = getConfig('log');
     }
 
     user (user) {
@@ -77,6 +80,8 @@ export default class Token {
             .replace(tokenType, "")
             .replace(" ", "");
 
+        this.log('Try to refresh this token: ' + token + ' with ' + refreshToken);
+
         let decodedToken = this.decode(token);
 
         if (decodedToken) {
@@ -100,7 +105,9 @@ export default class Token {
 }
 
 function generateJsonWebToken (jwtContent, device) {
-    let jwtKey = process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD',
+    let log = getConfig('log'),
+    
+        jwtKey = process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD',
     
         refreshToken = generateRefreshToken(jwtContent.identity),
         
@@ -115,7 +122,7 @@ function generateJsonWebToken (jwtContent, device) {
             "disabled" : false
         })
         .then(device => {
-            console.log("Token generated");
+            log("Token generated");
 
             return {
                 "refresh_token" : refreshToken,

@@ -7,6 +7,7 @@ import {
     appendInputValidation,
     successLoginInMiddleware
 } from './../helpers/login';
+import { getConfig } from './../config';
 
 const doLoginSettings = {
     'usernameField' : 'username',
@@ -39,8 +40,18 @@ const doLoginSettings = {
     }
 };
 
+function log (data) {
+    let l = getConfig('log');
+
+    l(data);
+}
+
+var strategyAdded;
 function defineStrategy (settings) { 
-    let self = this;
+    if (strategyAdded)
+        return;
+
+    strategyAdded = true;
 
     passport.use(new Strategy({
         usernameField: settings.usernameField,
@@ -64,15 +75,15 @@ export default function (settings, middleware) {
         function (req, res, next) {
             return passport.authenticate('local', function(err, account) {
                 if (!err && account) {
-                    console.log('Authentication success');
+                    log('Authentication success');
 
                     successLoginInMiddleware(account, req, next, settings);
                 } else if (err) {
-                    console.log('Error: passport authenticate error');
+                    log('Error: passport authenticate error');
 
                     next(err);
                 } else {
-                    console.log('Authentication failed');
+                    log('Authentication failed');
 
                     settings.invalidAuthenticate(res);
                 }

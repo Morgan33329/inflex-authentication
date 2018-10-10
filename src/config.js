@@ -22,6 +22,10 @@ const defaultSettings = {
         'type': 'mongo'
     },
 
+    'log' : (data) => {
+        //do something
+    },
+
     'mailTransport' : {
         'service' : 'gmail',
         'auth' : {
@@ -47,7 +51,7 @@ const defaultSettings = {
                         });
                     })
                     .catch(err => { 
-                        console.log(err);
+                        console.error(err);
             
                         res.send("fail doJWTLogin");
                     });

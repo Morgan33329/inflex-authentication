@@ -18,7 +18,7 @@ import Social from './mongo/models/social';
 class Mongo {
     checkConfig (cnf) {
         if (!cnf.host) {
-            console.log('Missing host from mongodb database config database');
+            console.error('Missing host from mongodb database config database');
             process.exit();
         }
 
@@ -69,7 +69,7 @@ class Mongo {
             case 'social':
                 return Social;
             default:
-                console.log("Model type " + model + " not found");
+                console.error("Model type " + model + " not found");
         }
     }
 }

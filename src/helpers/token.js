@@ -7,7 +7,7 @@ export default function (type) {
             return new jwtToken();
         break;
         default:
-            console.log("ERROR: Token generator: " + type + " not supported");
+            console.error("ERROR: Token generator: " + type + " not supported");
     }
 
     return null;

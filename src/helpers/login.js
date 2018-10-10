@@ -10,6 +10,12 @@ import {
     createObject
 } from "./user";
 
+function log (data) {
+    let l = authConfig('log')
+
+    l(data);
+};
+
 const msg = "Invalid username or password";
 
 var validateToArray = function(ret, data) {
@@ -42,7 +48,7 @@ export function appendInputValidation (middleware, settings) {
             let errors = validationResult(req);
 
             if (!errors.isEmpty()) {
-                console.log('Invalid authenticate request', errors.array());
+                log('Invalid authenticate request', errors.array());
         
                 settings.invalidRequest(req, res, errors.array(), settings);
             } else
@@ -59,7 +65,7 @@ export function byUsernameAndPassword (username, password, done) {
         .findByAccount(username)
         .then((account) => {
             if (account) {
-                console.log('Account found' + account.identity_id);
+                log('Account found' + account.identity_id);
 
                 database()
                     .repository('password')
@@ -71,7 +77,7 @@ export function byUsernameAndPassword (username, password, done) {
 
                             bcrypt.compare(password, pass[key].password, function(err, res) {
                                 if (res) {
-                                    console.log('Valid password found');
+                                    log('Valid password found');
 
                                     createObject({
                                         identity : account.identity_id,
@@ -85,7 +91,7 @@ export function byUsernameAndPassword (username, password, done) {
                                         throw err;
                                     });
                                 } else {
-                                    console.log('Invalid password');
+                                    log('Invalid password');
 
                                     checkPassword(key + 1, existsPasswords);
                                 }
@@ -98,7 +104,7 @@ export function byUsernameAndPassword (username, password, done) {
                         throw err;
                     });
             } else {
-                console.log("Account " + username + " not found");
+                log("Account " + username + " not found");
 
                 done(null, false, { message: msg });
             }

@@ -22,6 +22,6 @@ export function action (type, version, action) {
         return defaultAction;
     }
 
-    console.log('ERROR: Invalid action for this route');
+    console.error('ERROR: Invalid action for this route');
     process.exit();
 }

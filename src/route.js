@@ -19,7 +19,7 @@ var refreshToken = function (req, res) {
         .refresh(req.headers.authorization, req.body.refresh_token)
         .then(token => {
             res.json({
-                'error' : false,
+                'success' : true,
                 'response' : {
                     'token' : token
                 }
@@ -27,11 +27,13 @@ var refreshToken = function (req, res) {
         })
         .catch(err => { 
             return res.status(422).json({ 
-                'error' : true,
-                "code" : '4220103',
-                "type" : '',
-                "title" : 'Invalid refresh token',
-                "detail" : 'Invalid refresh token: ' + req.body.refresh_token
+                'success' : false,
+                'error' : {
+                    "code" : '4220103',
+                    "type" : '',
+                    "title" : 'Invalid refresh token',
+                    "detail" : 'Invalid refresh token: ' + req.body.refresh_token
+                }
             });
         });
 }
