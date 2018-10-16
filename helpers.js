@@ -6,8 +6,14 @@ const user = require('./' + dir + '/helpers/user');
 
 const login = require('./' + dir + '/helpers/login');
 
+const version = require('./' + dir + '/helpers/version');
+
 module.exports = {
     'createObject' : user.createObject,
     
-    'successLoginInMiddleware' : login.successLoginInMiddleware
+    'successLoginInMiddleware' : login.successLoginInMiddleware,
+
+    'routeAction' : version.action,
+
+    'routeMiddleware' : version.middleware
 };

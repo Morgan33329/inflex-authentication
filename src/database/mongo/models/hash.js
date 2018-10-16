@@ -26,4 +26,4 @@ hashSchema.pre('save', function(next) {
     next();
 });
 
-export default mongoose.model('user_hash', hashSchema);
+export default mongoose.model('auth_hash', hashSchema);

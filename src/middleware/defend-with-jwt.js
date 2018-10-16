@@ -19,20 +19,23 @@ const doJwtSettings = {
     'check_expire' : true
 };
 
-function Validate() {
-    let ir = require('./../../repositories/identity');
+function log (data) {
+    let l = getConfig('log');
 
-    this.identityRepository = new ir();
-
-    this.userService = new UserService();
+    l(data);
 }
 
+var strategyAdded;
 function defineStrategy(settings) {
-    let self = this,
-        opts = {
+    if (strategyAdded)
+        return;
+
+    let opts = {
             'jwtFromRequest' : extractJwt.fromAuthHeaderAsBearerToken(),
             'secretOrKey' : process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD'
         };
+
+    strategyAdded = true;
 
     passport.use(new jwtStrategy(opts, function(jwt_payload, done) {
         database()
@@ -40,10 +43,10 @@ function defineStrategy(settings) {
             .findOneById(jwt_payload.identity || 0)
             .then(identity => {
                 if (!identity) {
-                    console.log('User (' + jwt_payload.identity + ') from token not found');
+                    log('User (' + jwt_payload.identity + ') from token not found');
                     return done(null, false);
                 } else if (identity.activated !== true) {
-                    console.log('This user is not activated in email');
+                    log('This user is not activated in email');
                     return done(null, false);
                 }
 
@@ -51,7 +54,7 @@ function defineStrategy(settings) {
                     isExpired = settings.check_expire !== false && jwt_payload.expired_at > 0 && jwt_payload.expired_at > seconds;
 
                 if (isExpired) {
-                    console.log('This token is expired');
+                    log('This token is expired');
                     return done(null, false);
                 }
 
@@ -60,20 +63,20 @@ function defineStrategy(settings) {
                         if (user.device.disabled === false) {
                             return done(null, user);
                         } else {
-                            console.log('This device is logged out');
+                            log('This device is logged out');
 
                             done(null, false);
                         }
                     })
                     .catch(err => {
-                        console.log(err);
+                        log(err);
         
                         done(null, false);
                     });
 
             })
             .catch(err => {
-                console.log('ERROR: ' + err);
+                log('ERROR: ' + err);
 
                 done(null, false);
             });

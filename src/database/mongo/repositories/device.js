@@ -2,6 +2,7 @@ var deviceRepository;
 
 import Promise from 'bluebird';
 
+import database from './../../../database';
 import Device from './../models/device';
 
 class DeviceRepository {

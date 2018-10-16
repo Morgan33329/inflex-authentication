@@ -1,14 +1,17 @@
 import database from './../database';
+import { getConfig } from './../config';
 
 export default class {
     user (user) {
         this.userObject = user;
+
+        this.log = getConfig('log');
     }
 
     logout (user) {
         var self = this;
 
-        console.log("Logout success");
+        self.log("Logout success");
 
         database()
             .repository('device')

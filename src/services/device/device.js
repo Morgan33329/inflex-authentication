@@ -1,6 +1,11 @@
 import database from './../../database';
+import { getConfig } from './../../config';
 
 export default class {
+    constructor () {
+        this.log = getConfig('log');
+    }
+
     user (user) {
         this.userObject = user;
 
@@ -25,7 +30,7 @@ export default class {
             .findOneByDeviceIdAndIdentity(id, database().getId(this.userObject.user))
             .then(device => {
                 if (!device) {
-                    console.log('Device not found: ' + id);
+                    self.log('Device not found: ' + id);
 
                     return database()
                         .repository('device')
@@ -34,7 +39,7 @@ export default class {
                             'device_id'  : id
                         })
                         .then(savedDevice => {
-                            console.log('Device uploaded');
+                            self.log('Device uploaded');
 
                             return savedDevice;
                         })
@@ -42,7 +47,7 @@ export default class {
                             throw err;
                         });
                 } else {
-                    console.log('Device found: ' + id);
+                    self.log('Device found: ' + id);
 
                     return device;
                 }
@@ -58,7 +63,9 @@ export default class {
     }
 
     update (options) {
-        var update   = {},
+        var self = this,
+        
+            update   = {},
             deviceId = database().getId(this.device);
 
         if (options.type) {
@@ -78,7 +85,7 @@ export default class {
             .repository('device')
             .update(deviceId, update)
             .then(device => {
-                console.log('Device updated: ' + JSON.stringify(options));
+                self.log('Device updated: ' + JSON.stringify(options));
 
                 return device;
             });

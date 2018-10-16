@@ -2,6 +2,7 @@ import Promise from 'bluebird';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 
+import { getConfig } from './../../config';
 import database from './../../database';
 import {
     getAuthKeys
@@ -15,6 +16,8 @@ var tokenType = 'bearer';
 export default class Token {
     constructor () {
         this.deviceService = new DeviceService();
+
+        this.log = getConfig('log');
     }
 
     user (user) {
@@ -36,17 +39,16 @@ export default class Token {
                     resolve(device);
                 });
         });
-
         return createDevice
             .then(device => { 
-                var expire = expire || 0,
+                var expiredAt = expire || 0,
                 
                     jwtContent;
-        
+
                 jwtContent = getAuthKeys(this.userObject);
 
-                if (expire > 0)
-                    jwtContent["expire"] = (new Date().getTime() / 1000) + expire;
+                if (expiredAt > 0)
+                    jwtContent["expire"] = Math.round((new Date().getTime() / 1000) + expiredAt);
 
                 return generateJsonWebToken(jwtContent, device)
                     .then(token => {
@@ -77,6 +79,8 @@ export default class Token {
             .replace(tokenType, "")
             .replace(" ", "");
 
+        this.log('Try to refresh this token: ' + token + ' with ' + refreshToken);
+
         let decodedToken = this.decode(token);
 
         if (decodedToken) {
@@ -100,7 +104,9 @@ export default class Token {
 }
 
 function generateJsonWebToken (jwtContent, device) {
-    let jwtKey = process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD',
+    let log = getConfig('log'),
+    
+        jwtKey = process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD',
     
         refreshToken = generateRefreshToken(jwtContent.identity),
         
@@ -115,7 +121,7 @@ function generateJsonWebToken (jwtContent, device) {
             "disabled" : false
         })
         .then(device => {
-            console.log("Token generated");
+            log("Token generated");
 
             return {
                 "refresh_token" : refreshToken,

@@ -11,7 +11,7 @@ export default function () {
     let databaseName = getConfig('database.type');
 
     if (!databaseName) {
-        console.log(new Error('Database type not set!'));
+        console.error('Database type not set!');
         process.exit();
     }
     

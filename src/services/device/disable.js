@@ -1,12 +1,17 @@
 import database from './../../database';
+import { getConfig } from './../../config';
 
 export default class {
-    device = function(device) {
+    constructor () {
+        this.log = getConfig('log');
+    }
+
+    device (device) {
         this.deviceData = device;
     }
 
-    exceptMe = function() {
-        console.log("All devices disabled");
+    exceptMe () {
+        this.log("All devices disabled, except me...");
 
         database()
             .repository('device')
