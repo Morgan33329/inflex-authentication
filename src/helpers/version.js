@@ -1,27 +1,17 @@
 import { authConfig } from './../authentication';
+import { settingsByUrl } from './settings'
 
-export function middleware (type, version) {
-    version = version || 'default';
+export function middleware (type, req) {
+    let middleware = settingsByUrl(req, authConfig('functions'))['middleware'];
 
-    return authConfig(version.replace('.', '_') + '.middleware.' + type);
+    return middleware && middleware[type] || null;
 }
 
-export function action (type, version, action) {
+export function action (type, req, action) {
     if (action)
         return action;
 
-    let versionAction = authConfig((version ? version.replace('.', '_') + '.' : '') + 'actions.' + type);
+    let middleware = settingsByUrl(req, authConfig('functions'))['actions'];
 
-    if (versionAction) {
-        return versionAction;
-    }
-
-    let defaultAction = authConfig('default.actions.' + type);
-
-    if (defaultAction) {
-        return defaultAction;
-    }
-
-    console.error('ERROR: Invalid action for this route');
-    process.exit();
+    return middleware && middleware[type] || null;
 }

@@ -7,17 +7,23 @@ import {
 } from 'passport-jwt';
 import _ from 'lodash';
 
-import { getConfig } from './../config';
 import logout from './../services/logout';
 import database from './../database';
-import { createObject } from './../helpers/user'
 import tokenGenerators from './../helpers/token';
+import { getConfig } from './../config';
+import { createObject } from './../helpers/user';
+import { middleware as routeMiddleware } from './../helpers/version';
+import { defineSettings, settingsByUrl } from './../helpers/settings';
 
-const doJwtSettings = {
+const defaultSettings = {
+    'version' : 'default',
+
     'expire' : null,
 
     'check_expire' : true
 };
+
+var versionSettings = {};
 
 function log (data) {
     let l = getConfig('log');
@@ -26,18 +32,22 @@ function log (data) {
 }
 
 var strategyAdded;
-function defineStrategy(settings) {
+function defineStrategy() {
     if (strategyAdded)
         return;
 
     let opts = {
-            'jwtFromRequest' : extractJwt.fromAuthHeaderAsBearerToken(),
-            'secretOrKey' : process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD'
+            jwtFromRequest : extractJwt.fromAuthHeaderAsBearerToken(),
+            secretOrKey : process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD',
+
+            passReqToCallback : true
         };
 
     strategyAdded = true;
 
-    passport.use(new jwtStrategy(opts, function(jwt_payload, done) {
+    passport.use(new jwtStrategy(opts, function(req, jwt_payload, done) {
+        let settings = settingsByUrl(req, versionSettings);
+
         database()
             .repository('identity')
             .findOneById(jwt_payload.identity || 0)
@@ -84,20 +94,21 @@ function defineStrategy(settings) {
 };
 
 var hasToken = function(req, res, next) {
-    let tokenMiddle = getConfig('middleware.token');
+    let middleware = routeMiddleware('token', req);
 
-    if (tokenMiddle)
-        tokenMiddle(req, res);
-
-    next();
+    if (middleware)
+        return middleware(req, res, next);
+    else
+        next();
 }
 
-export default function (settings, middleware) {
-    middleware = middleware || [];
+export default function (options, middleware) {
+    let version = options && options.version || 'default';
 
-    settings = _.merge(doJwtSettings, settings);
+    middleware      = middleware || [];
+    versionSettings = defineSettings(version, options, versionSettings, defaultSettings);
 
-    defineStrategy(settings);
+    defineStrategy();
 
     middleware.push(
         passport.authenticate('jwt', { session: false }),

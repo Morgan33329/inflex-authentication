@@ -24,7 +24,8 @@ export function authConfig (configOrKey) {
         return getConfig(configOrKey);
     } else if (type === 'object') {
         setConfig(configOrKey);
-    }
+    } else
+        return getConfig();
 }
 
 export function addAction (type, version, action) {
@@ -35,7 +36,7 @@ export function addAction (type, version, action) {
 
     version = version.replace('.', '_');
 
-    changeConfig(version + '.actions.' + type, action);
+    changeConfig('functions.' + version + '.actions.' + type, action);
 }
 
 export function addMiddleware (type, version, middleware) {
@@ -46,7 +47,7 @@ export function addMiddleware (type, version, middleware) {
 
     version = version.replace('.', '_');
     
-    changeConfig(version + '.middleware.' + type, middleware);
+    changeConfig('functions.' + version + '.middleware.' + type, middleware);
 }
 
 /**

@@ -34,27 +34,29 @@ const defaultSettings = {
         }
     },
 
-    'default' : {
-        'actions' : {
-            'login' : (req, res) => {
-                req
-                    .token()
-                    .generate(req.body.device)
-                    .then((ret) => {
-                        ret.disable.exceptMe();
-            
-                        res.json({
-                            "error" : false,
-                            "response" : {
-                                "token" : ret.token
-                            }
+    'functions' : {
+        'default' : {
+            'actions' : {
+                'login' : (req, res) => {
+                    req
+                        .token()
+                        .generate(req.body.device)
+                        .then((ret) => {
+                            ret.disable.exceptMe();
+                
+                            res.json({
+                                "error" : false,
+                                "response" : {
+                                    "token" : ret.token
+                                }
+                            });
+                        })
+                        .catch(err => { 
+                            console.error(err);
+                
+                            res.send("fail doJWTLogin");
                         });
-                    })
-                    .catch(err => { 
-                        console.error(err);
-            
-                        res.send("fail doJWTLogin");
-                    });
+                }
             }
         }
     }
@@ -78,7 +80,9 @@ export function setConfig (cnf) {
 }
 
 export function getConfig (key) {
-    return _.get(settings, key);
+    return key
+        ? _.get(settings, key)
+        : settings;
 }
 
 export function changeConfig (key, value) {

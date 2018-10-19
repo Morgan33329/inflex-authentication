@@ -8,8 +8,11 @@ import {
     successLoginInMiddleware
 } from './../helpers/login';
 import { getConfig } from './../config';
+import { defineSettings, settingsByVersion } from './../helpers/settings';
 
-const doLoginSettings = {
+const defaultSettings = {
+    'version' : 'default',
+
     'usernameField' : 'username',
     'passwordField' : 'password',
 
@@ -39,6 +42,7 @@ const doLoginSettings = {
         });
     }
 };
+var versionSettings = {};
 
 function log (data) {
     let l = getConfig('log');
@@ -46,26 +50,30 @@ function log (data) {
     l(data);
 }
 
-var strategyAdded;
+
+var strategyAdded = {};
 function defineStrategy (settings) { 
-    if (strategyAdded)
+    if (strategyAdded[settings.version])
         return;
 
-    strategyAdded = true;
+    strategyAdded[settings.version] = true;
 
-    passport.use(new Strategy({
+    passport.use('local-' + settings.version, new Strategy({
         usernameField: settings.usernameField,
         passwordField: settings.passwordField
-    }, (username, password, done) => {
+    }, (username, password, done) => { console.log(username, password);
         byUsernameAndPassword(username, password, done);
     }));
 }
  
-export default function (settings, middleware) {
-    settings = settings || {};
-    settings = _.merge(doLoginSettings, settings);
+export default function (options, middleware) {
+    let version = options && options.version || 'default';
+    
+    middleware      = middleware || [];
+    versionSettings = defineSettings(version, options, versionSettings, defaultSettings);
 
-    let ret = middleware || [];
+    let settings = settingsByVersion(version, versionSettings),
+        ret      = middleware || []
 
     defineStrategy(settings);
 
@@ -73,7 +81,7 @@ export default function (settings, middleware) {
 
     ret.push(
         function (req, res, next) {
-            return passport.authenticate('local', function(err, account) {
+            return passport.authenticate('local-' + settings.version, function(err, account) {
                 if (!err && account) {
                     log('Authentication success');
 

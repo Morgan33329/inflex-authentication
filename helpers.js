@@ -8,6 +8,8 @@ const login = require('./' + dir + '/helpers/login');
 
 const version = require('./' + dir + '/helpers/version');
 
+const settings = require('./' + dir + '/helpers/settings');
+
 module.exports = {
     'createObject' : user.createObject,
     
@@ -15,5 +17,11 @@ module.exports = {
 
     'routeAction' : version.action,
 
-    'routeMiddleware' : version.middleware
+    'routeMiddleware' : version.middleware,
+
+    'defineSettings' : settings.defineSettings,
+
+    'settingsByUrl' : settings.settingsByUrl,
+
+    'settingsByVersion' : settings.settingsByVersion
 };

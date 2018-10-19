@@ -35,8 +35,8 @@ export function appendInputValidation (middleware, settings) {
     let inputs = authConfig('validateInputs');
 
     middleware = validateToArray(middleware, (req, res, next) => {
-        if (!req.body.username)
-            settings.invalidRequest(req, res, ['username'], settings);
+        if (!req.body[settings.usernameField])
+            settings.invalidRequest(req, res, [settings.usernameField], settings);
         else
             next();
     });
