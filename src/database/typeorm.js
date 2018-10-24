@@ -13,6 +13,7 @@ import AccountRepository from './typeorm/repositories/account';
 import DeviceRepository from './typeorm/repositories/device';
 import IdentityRepository from './typeorm/repositories/identity';
 import PasswordRepository from './typeorm/repositories/password';
+import SocialRepository from './typeorm/repositories/social';
 
 /**
  * Example config:
@@ -86,8 +87,10 @@ class TypeORM {
                 return IdentityRepository();
             case 'password':
                 return PasswordRepository();
+            case 'social':
+                return SocialRepository();
             default:
-                console.error("Repository " + model + " not found");
+                console.error("Repository " + type + " not found");
                 process.exit();
         }
     }

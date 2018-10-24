@@ -6,6 +6,7 @@ import AccountRepository from './mongoose/repositories/account';
 import DeviceRepository from './mongoose/repositories/device';
 import IdentityRepository from './mongoose/repositories/identity';
 import PasswordRepository from './mongoose/repositories/password';
+import SocialRepository from './mongoose/repositories/social';
 
 import Account from './mongoose/models/account';
 import Device from './mongoose/models/device';
