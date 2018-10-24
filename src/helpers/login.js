@@ -65,7 +65,7 @@ export function byUsernameAndPassword (username, password, done) {
         .findByAccount(username)
         .then((account) => {
             if (account) {
-                log('Account found' + account.identity_id);
+                log('Account found ' + JSON.stringify(account));
 
                 database()
                     .repository('password')

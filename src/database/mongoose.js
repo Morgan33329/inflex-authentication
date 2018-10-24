@@ -2,27 +2,34 @@ var mongoClass;
 
 import mongoose from 'mongoose';
 
-import AccountRepository from './mongo/repositories/account';
-import DeviceRepository from './mongo/repositories/device';
-import IdentityRepository from './mongo/repositories/identity';
-import PasswordRepository from './mongo/repositories/password';
-import SocialRepository from './mongo/repositories/social';
+import AccountRepository from './mongoose/repositories/account';
+import DeviceRepository from './mongoose/repositories/device';
+import IdentityRepository from './mongoose/repositories/identity';
+import PasswordRepository from './mongoose/repositories/password';
 
-import Account from './mongo/models/account';
-import Device from './mongo/models/device';
-import Identity from './mongo/models/identity';
-import Hash from './mongo/models/hash';
-import Password from './mongo/models/password';
-import Social from './mongo/models/social';
+import Account from './mongoose/models/account';
+import Device from './mongoose/models/device';
+import Identity from './mongoose/models/identity';
+import Hash from './mongoose/models/hash';
+import Password from './mongoose/models/password';
+import Social from './mongoose/models/social';
 
-class Mongo {
+/**
+ * Example config:
+ * 
+ * database : {
+ *     library : "mongoose",
+ *
+ *     host : 'mongodb://deckathlon:deckathlon@localhost:27017/deckathlon'
+ * }
+ */
+
+class Mongoose {
     checkConfig (cnf) {
         if (!cnf.host) {
             console.error('Missing host from mongodb database config database');
             process.exit();
         }
-
-        this.connect(cnf.host);
     }
 
     getType () {
@@ -33,8 +40,8 @@ class Mongo {
         return object._id;
     }
 
-    connect(host) {
-        mongoose.connect(host, { 
+    connect(settings) {
+        mongoose.connect(settings.host, { 
             useNewUrlParser: true 
         });
     }
@@ -66,8 +73,6 @@ class Mongo {
                 return Password;
             case 'hash':
                 return Hash;
-            case 'social':
-                return Social;
             default:
                 console.error("Model type " + model + " not found");
         }
@@ -76,7 +81,7 @@ class Mongo {
 
 export default function () {
     if (!mongoClass)
-        mongoClass = new Mongo();
+        mongoClass = new Mongoose();
 
     return mongoClass;
 }

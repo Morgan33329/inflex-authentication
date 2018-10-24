@@ -55,7 +55,7 @@ function defineStrategy() {
                 if (!identity) {
                     log('User (' + jwt_payload.identity + ') from token not found');
                     return done(null, false);
-                } else if (identity.activated !== true) {
+                } else if (!identity.activated) {
                     log('This user is not activated in email');
                     return done(null, false);
                 }
@@ -70,7 +70,7 @@ function defineStrategy() {
 
                 createObject(jwt_payload)
                     .then(user => {
-                        if (user.device.disabled === false) {
+                        if (!user.device.disabled) {
                             return done(null, user);
                         } else {
                             log('This device is logged out');

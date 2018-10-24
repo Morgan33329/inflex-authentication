@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import database from './database';
 import os from 'os';
 
 const defaultSettings = {
@@ -19,7 +18,7 @@ const defaultSettings = {
     },
 
     'database' : {
-        'type': 'mongo'
+        'library': 'typeorm'
     },
 
     'log' : (data) => {
@@ -73,10 +72,6 @@ export function setConfig (cnf) {
 
         settings.loginWith = objectLoginWIth
     }
-
-    let db = database();
-
-    db.checkConfig(settings.database);
 }
 
 export function getConfig (key) {

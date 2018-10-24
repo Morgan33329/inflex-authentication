@@ -1,5 +1,6 @@
 import passport from 'passport';
 
+import database from './database';
 import loginWithApi from './middleware/login-with-api';
 import defendWithJwt from './middleware/defend-with-jwt';
 
@@ -64,6 +65,13 @@ export function authExpress (app) {
 
     app.use(passport.initialize());
     app.use(passport.session());
+
+    // Connect to database
+    let db = database(),
+        dbConfig = getConfig('database');
+
+    db.checkConfig(dbConfig);
+    db.connect(dbConfig);
 }
 
 /**
