@@ -33,6 +33,9 @@ import SocialRepository from './typeorm/repositories/social';
 
 class TypeORM {
     checkConfig (cnf) {
+        if (cnf.manualConnect)
+            return;
+
         if (!cnf.username || !cnf.password || !cnf.database) {
             console.error('Missing data from mongodb database config database');
             process.exit();
@@ -57,6 +60,12 @@ class TypeORM {
         entities.push(require('./typeorm/schema/password'));
         entities.push(require('./typeorm/schema/hash'));
         entities.push(require('./typeorm/schema/social'));
+
+        if (cnf.manualConnect) {
+            cnf.manualConnect(createConnection, entities);
+
+            return;
+        }
 
         createConnection({
             type : cnf.type || 'mysql',

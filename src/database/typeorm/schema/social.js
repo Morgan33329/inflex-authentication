@@ -4,7 +4,7 @@ import Social from '../models/social';
 
 module.exports = new EntitySchema({
     tableName : 'auth_social',
-    name : 'Password',
+    name : 'Social',
     target : Social,
     columns : {
         id : {
