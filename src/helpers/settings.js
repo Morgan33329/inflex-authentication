@@ -24,9 +24,17 @@ export function settingsByUrl (req, settings) {
         if (version == 'default')
             continue;
 
-        let v = version.replace('_', '.');
+        let v = version.replace('_', '.'),
+            path;
 
-        if (req.path.toString().match(new RegExp(v)))
+        if (req.path)
+            path = req.path;
+        else if (req.originalUrl)
+            path = req.get('host') + req.originalUrl;
+        else
+            path = '/';
+
+        if (path.toString().match(new RegExp(v)))
             thisSettings = settings[version];
     }
 

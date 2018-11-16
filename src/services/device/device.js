@@ -1,3 +1,6 @@
+import _ from 'lodash';
+import Promise from 'bluebird';
+
 import database from './../../database';
 import { getConfig } from './../../config';
 
@@ -21,9 +24,11 @@ export default class {
     create (options) { 
         options = options || {};
 
+        options.id = options.id || 'web'
+
         let self = this, 
 
-            id = options.id || 'web';
+            id = options.id;
 
         return database()
             .repository('device')
@@ -81,13 +86,17 @@ export default class {
         if (options.language)
             update.device_language = options['language'];
 
-        return database()
-            .repository('device')
-            .update(deviceId, update)
-            .then(device => {
-                self.log('Device updated: ' + JSON.stringify(options));
+        if (!_.isEmpty(update)) {
+            return database()
+                .repository('device')
+                .update(deviceId, update)
+                .then(device => {
+                    self.log('Device updated: ' + JSON.stringify(options));
 
-                return device;
-            });
+                    return device;
+                });
+        } else {
+            return Promise.resolve(this.device);
+        }
     }
 }

@@ -18,8 +18,6 @@ import { defineSettings, settingsByUrl } from './../helpers/settings';
 const defaultSettings = {
     'version' : 'default',
 
-    'expire' : null,
-
     'check_expire' : true
 };
 
@@ -46,7 +44,14 @@ function defineStrategy() {
     strategyAdded = true;
 
     passport.use(new jwtStrategy(opts, function(req, jwt_payload, done) {
-        let settings = settingsByUrl(req, versionSettings);
+        let settings;
+
+        if (req.tokenSettings) {
+            settings = req.tokenSettings;
+
+            delete req.tokenSettings;
+        } else
+            settings = defaultSettings;
 
         database()
             .repository('identity')
@@ -106,11 +111,16 @@ export default function (options, middleware) {
     let version = options && options.version || 'default';
 
     middleware      = middleware || [];
-    versionSettings = defineSettings(version, options, versionSettings, defaultSettings);
 
     defineStrategy();
 
     middleware.push(
+        function (req, res, next) {
+            req.tokenSettings = _.assign({}, defaultSettings, options);
+
+            next();
+        },
+
         passport.authenticate('jwt', { session: false }),
 
         hasToken

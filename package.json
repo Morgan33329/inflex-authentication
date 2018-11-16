@@ -13,7 +13,6 @@
     "express-validator": "^5.3.0",
     "jsonwebtoken": "^8.3.0",
     "lodash": "^4.17.11",
-    "mongoose": "^5.3.4",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
@@ -29,6 +28,7 @@
     "babel-cli": "^6.26.0",
     "babel-preset-env": "^1.7.0",
     "babel-preset-stage-2": "^6.24.1"
+
   },
   "engines": {},
   "homepage": "https://github.com/morgan92333",
@@ -50,7 +50,7 @@
   "scripts": {
     "only-dev": "npm install --only=dev",
     "publish": "npm run build && npm publish",
-    "watch-node": "nodemon --exec babel-node --presets env,stage-2 examples/simple-config.js",
+    "start": "nodemon --exec babel-node examples/simple-config.js",
     "build": "babel src --out-dir lib"
   }
 }
