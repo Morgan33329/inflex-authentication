@@ -74,7 +74,7 @@ export default class Token {
         return null;
     }
 
-    refresh (token, refreshToken) {
+    refresh (token, refreshToken, expire) {
         token = token
             .replace(tokenType, "")
             .replace(" ", "");
@@ -95,6 +95,11 @@ export default class Token {
                         return Promise.reject("Device not found for this token");
                     else if (device.refresh_token != refreshToken)
                         return Promise.reject("Invalid refresh token");
+
+                    var expiredAt = expire || 0;
+                    
+                    if (expiredAt > 0)
+                        decodedToken["expire"] = Math.round((new Date().getTime() / 1000) + expiredAt);
 
                     return generateJsonWebToken(decodedToken, device);
                 });

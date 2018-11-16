@@ -66,7 +66,7 @@ function defineStrategy() {
                 }
 
                 let seconds   = new Date().getTime() / 1000,
-                    isExpired = settings.check_expire !== false && jwt_payload.expired_at > 0 && jwt_payload.expired_at > seconds;
+                    isExpired = settings.check_expire !== false && jwt_payload.expire > 0 && jwt_payload.expire < parseInt(seconds);
 
                 if (isExpired) {
                     log('This token is expired');
