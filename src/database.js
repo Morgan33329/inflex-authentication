@@ -1,9 +1,8 @@
-import mongoose from './database/mongoose';
-import typeorm from './database/typeorm';
-
 import {
     getConfig
 } from './config';
+
+var library = null;
 
 /**
  * Get the database driver by database.tpye in config
@@ -18,13 +17,15 @@ export default function () {
 
     switch (databaseName) {
         case 'mongoose':
-            return mongoose();
+            if (!library) library = require('./database/mongoose').default;
             break;
         case 'typeorm':
-            return typeorm();
+            if (!library) library = require('./database/typeorm').default;
             break;
         default:
             console.error('Invalid database type!');
             process.exit();
     }
+
+    return library();
 }

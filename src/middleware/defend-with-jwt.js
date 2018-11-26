@@ -8,12 +8,14 @@ import {
 import _ from 'lodash';
 
 import logout from './../services/logout';
+import Jwt from './../services/token/jwt';
 import database from './../database';
 import tokenGenerators from './../helpers/token';
 import { getConfig } from './../config';
 import { createObject } from './../helpers/user';
 import { middleware as routeMiddleware } from './../helpers/version';
 import { defineSettings, settingsByUrl } from './../helpers/settings';
+import { JwtVerifier } from 'passport-jwt/lib/strategy';
 
 const defaultSettings = {
     'version' : 'default',
@@ -36,7 +38,7 @@ function defineStrategy() {
 
     let opts = {
             jwtFromRequest : extractJwt.fromAuthHeaderAsBearerToken(),
-            secretOrKey : process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD',
+            secretOrKey : process.env.JWT_SECRET || 'DqOlYSMMLZCr8JxSffaQ7Kpe7sd9s28M4UjJVyrvHD0GcUSqke1bCYoAXk7EHr1BKxy16xiUi0WEfKsFonxxHJeAwlva0qdN9L4b',
 
             passReqToCallback : true
         };
@@ -44,7 +46,9 @@ function defineStrategy() {
     strategyAdded = true;
 
     passport.use(new jwtStrategy(opts, function(req, jwt_payload, done) {
-        let settings;
+        let settings,
+        
+            jwtService = new Jwt();
 
         if (req.tokenSettings) {
             settings = req.tokenSettings;
@@ -53,12 +57,14 @@ function defineStrategy() {
         } else
             settings = defaultSettings;
 
+        let userData = jwtService.decryptData(jwt_payload.token_hash);
+
         database()
             .repository('identity')
-            .findOneById(jwt_payload.identity || 0)
+            .findOneById(userData.identity || 0)
             .then(identity => {
                 if (!identity) {
-                    log('User (' + jwt_payload.identity + ') from token not found');
+                    log('User (' + userData.identity + ') from token not found');
                     return done(null, false);
                 } else if (!identity.activated) {
                     log('This user is not activated in email');
@@ -73,7 +79,7 @@ function defineStrategy() {
                     return done(null, false);
                 }
 
-                createObject(jwt_payload)
+                createObject(userData)
                     .then(user => {
                         if (!user.device.disabled) {
                             return done(null, user);

@@ -29,7 +29,7 @@ export default class Token {
         return this;
     }
 
-    generate (options, expire) {
+    generate (options, expire = 0, customContent = null) {
         var self = this;    
 
         var createDevice = new Promise((resolve) => {
@@ -39,13 +39,20 @@ export default class Token {
                     resolve(device);
                 });
         });
+
         return createDevice
             .then(device => { 
                 var expiredAt = expire || 0,
                 
-                    jwtContent;
+                    jwtContent = customContent || {},
+                    object     = getAuthKeys(self.userObject);
 
-                jwtContent = getAuthKeys(this.userObject);
+                object.device    = database().getId(device);
+                object.timestamp = Date.now();
+
+                jwtContent = {
+                    token_hash : self.encryptData(object)
+                };
 
                 if (expiredAt > 0)
                     jwtContent["expire"] = Math.round((new Date().getTime() / 1000) + expiredAt);
@@ -62,6 +69,14 @@ export default class Token {
                         });
                     });
             });
+    }
+
+    encryptData (data) {
+        return encrypt(JSON.stringify(data));
+    }
+
+    decryptData (data) {
+        return JSON.parse(decrypt(data));
     }
 
     decode (token) {
@@ -111,13 +126,11 @@ export default class Token {
 function generateJsonWebToken (jwtContent, device) {
     let log = getConfig('log'),
     
-        jwtKey = process.env.JWT_SECRET || 'OFcKgPZjWyLPlpXe80WMR6qRGJKG7RLD',
+        jwtKey = process.env.JWT_SECRET || 'DqOlYSMMLZCr8JxSffaQ7Kpe7sd9s28M4UjJVyrvHD0GcUSqke1bCYoAXk7EHr1BKxy16xiUi0WEfKsFonxxHJeAwlva0qdN9L4b',
     
         refreshToken = generateRefreshToken(jwtContent.identity),
         
         deviceId = database().getId(device);
-
-    jwtContent.device = deviceId;
 
     return database()
         .repository('device')
@@ -130,7 +143,7 @@ function generateJsonWebToken (jwtContent, device) {
 
             return {
                 "refresh_token" : refreshToken,
-                'token_type' : tokenType,
+                'token_type' : tokenType.charAt(0).toUpperCase() + tokenType.slice(1),
                 "access_token" : jwt.sign(jwtContent, jwtKey),
                 "expires_in" : jwtContent["expire"] || 0
             };
@@ -139,4 +152,22 @@ function generateJsonWebToken (jwtContent, device) {
 
 function generateRefreshToken (identity) {
     return crypto.createHash('md5').update(identity + "_" + new Date().getTime()).digest("hex");
+}
+
+function encrypt (text) {
+    var cipher = crypto.createCipher('aes-256-cbc','d6F3Efeq');
+    var crypted = cipher.update(text,'utf8','hex');
+
+    crypted += cipher.final('hex');
+
+    return crypted;
+}
+  
+function decrypt (text) {
+    var decipher = crypto.createDecipher('aes-256-cbc','d6F3Efeq');
+    var dec = decipher.update(text,'hex','utf8');
+
+    dec += decipher.final('utf8');
+
+    return dec;
 }
