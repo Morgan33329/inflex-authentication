@@ -1,23 +1,23 @@
 {
   "name": "inflex-authentication",
   "main": "./authentication.js",
-  "version": "0.0.56",
+  "version": "0.0.57",
   "author": {
     "name": "Morgan",
     "email": "morgan92333@gmail.com",
     "url": "https://github.com/morgan92333"
   },
   "dependencies": {
-    "@babel/runtime": "^7.1.5",
+    "@babel/runtime": "^7.3.1",
     "bcrypt": "^2.0.1",
     "bluebird": "^3.5.3",
-    "express-validator": "^5.3.0",
+    "express-validator": "^5.3.1",
     "jsonwebtoken": "^8.4.0",
     "lodash": "^4.17.11",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "passport-local": "^1.0.0",
-    "moment": "^2.22.2"
+    "moment": "^2.24.0"
   },
   "bugs": {
     "url": ""
@@ -26,11 +26,9 @@
   "deprecated": false,
   "description": "Simple, authentication for Node.js.",
   "devDependencies": {
-    "@babel/cli": "^7.1.5",
-    "@babel/core": "^7.1.5",
-    "@babel/node": "^7.0.0",
-    "@babel/plugin-transform-runtime": "^7.1.0",
-    "@babel/preset-env": "^7.1.5"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.7.0",
+    "babel-preset-stage-2": "^6.24.1"
   },
   "engines": {},
   "homepage": "https://github.com/morgan92333",
