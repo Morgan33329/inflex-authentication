@@ -1,4 +1,5 @@
 import bcrypt from 'bcrypt';
+import Promise from 'bluebird';
 import { check, validationResult } from 'express-validator/check';
 
 import { authConfig } from './../authentication';
@@ -17,6 +18,7 @@ function log (data) {
 };
 
 const msg = "Invalid username or password";
+const notActivated = "This user is not activated";
 
 var validateToArray = function(ret, data) {
     if (!data)
@@ -67,46 +69,91 @@ export function byUsernameAndPassword (username, password, done) {
             if (account) {
                 log('Account found ' + JSON.stringify(account));
 
-                database()
-                    .repository('password')
-                    .findAllByIdentity(account.identity_id)
-                    .then((existsPasswords) => {
-                        var checkPassword = function(key, pass) {
-                            if (!pass[key])
-                                return done(null, false, { message: msg });
+                let getPassword = function () {
+                    return new Promise((resolve, reject) => {
+                        database()
+                            .repository('password')
+                            .findAllByIdentity(account.identity_id)
+                            .then((existsPasswords) => {
+                                var checkPassword = function(key, pass) {
+                                    if (!pass[key])
+                                        return resolve(null);
 
-                            bcrypt.compare(password, pass[key].password, function(err, res) {
-                                if (res) {
-                                    log('Valid password found');
+                                    bcrypt.compare(password, pass[key].password, function(err, res) {
+                                        if (res) {
+                                            log('Valid password found');
 
-                                    createObject({
-                                        identity : account.identity_id,
-                                        password : database().getId(pass[key]),
-                                        account : database().getId(account)
-                                    })
-                                    .then(user => {
-                                        done(null, user);
-                                    })
-                                    .catch((err) => {
-                                        throw err;
+                                            resolve(pass[key]);
+                                        } else {
+                                            log('Invalid password');
+
+                                            checkPassword(key + 1, existsPasswords);
+                                        }
                                     });
-                                } else {
-                                    log('Invalid password');
-
-                                    checkPassword(key + 1, existsPasswords);
                                 }
-                            });
-                        }
 
-                        checkPassword(0, existsPasswords);
+                                checkPassword(0, existsPasswords);
+                            })
+                            .catch((err) => {
+                                reject(err);
+                            });
                     })
-                    .catch((err) => {
-                        throw err;
+                }
+
+                let getIdentity = function () {
+                    return new Promise((resolve, reject) => {
+                        database()
+                            .repository('identity')
+                            .findOneById(account.identity_id)
+                            .then(identity => {
+                                if (!identity)
+                                    reject('Identity not found');
+                                else
+                                    resolve(identity)
+                            })
+                            .catch((err) => {
+                                reject(err);
+                            });
+                    });
+                }
+
+                Promise
+                    .all([
+                        getPassword(),
+                        getIdentity()
+                    ])
+                    .then(values => {
+                        let password = values[0],
+                            identity = values[1];
+
+                        if (!password)
+                            return done(null, false, { message: msg, code : 1 });
+                        else if (!identity.activated) { console.log(notActivated);
+                            return done(null, false, { message: notActivated, code : 2 });
+                        } else 
+                            createObject({
+                                identity : database().getId(identity),
+                                password : database().getId(password),
+                                account : database().getId(account)
+                            })
+                            .then(user => {
+                                done(null, user);
+                            })
+                            .catch((err) => {
+                                console.error(err);
+
+                                return done(null, false, { message: 'Something bad', code : -1 });
+                            });
+                    })
+                    .catch(err => {
+                        console.error(err);
+
+                        done(null, false, { message: 'Something bad', code : -1 });
                     });
             } else {
                 log("Account " + username + " not found");
 
-                done(null, false, { message: msg });
+                done(null, false, { message: msg, code : 3 });
             }
         })
         .catch((err) => {
@@ -122,6 +169,8 @@ export function successLoginInMiddleware (account, req, next, settings) {
         .create(req.body.device || {})
         .then(device => {
             account.device = device;
+
+            account.id = database().getId(account.user);
 
             req.logIn(account, {
                 "session" : settings && settings.session ? settings.session : false

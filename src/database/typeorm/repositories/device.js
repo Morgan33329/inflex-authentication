@@ -7,15 +7,19 @@ var deviceRepository;
 
 class DeviceRepository {
     insert (data) {
+        let newDevice = new Device(0, data.identity_id, null, data.device_id);
+
         return getManager()
-            .createQueryBuilder()
-            .insert()
-            .into(Device)
-            .values([ data ])
-            .execute();
+            .save([ newDevice ])
+            .then(() => {
+                return newDevice;
+            });
     }
 
     update (id, data) {
+        if (!id)
+            return;
+
         let self = this;
 
         return getManager()
@@ -29,7 +33,10 @@ class DeviceRepository {
             });
     }
 
-    findOneById (id) {    
+    findOneById (id) {  
+        if (!id)
+            return;
+        
         return getManager()
             .getRepository(Device)
             .createQueryBuilder('device')
@@ -38,6 +45,9 @@ class DeviceRepository {
     }
 
     findOneByDeviceId (deviceId) {
+        if (!deviceId)
+            return;
+
         return getManager()
             .getRepository(Device)
             .createQueryBuilder('device')
@@ -46,6 +56,9 @@ class DeviceRepository {
     }
 
     disableAllExceptThis (device) {
+        if (!device)
+            return;
+
         return getManager()
             .createQueryBuilder()
             .update(Device)
@@ -59,6 +72,9 @@ class DeviceRepository {
     }
 
     disableAll (identity) {
+        if (!identity)
+            return;
+
         return getManager()
             .createQueryBuilder()
             .update(Device)
@@ -71,6 +87,9 @@ class DeviceRepository {
     }
 
     findOneByDeviceIdAndIdentity (deviceId, identityId) {
+        if (!deviceId || !identityId)
+            return;
+
         return getManager()
             .getRepository(Device)
             .createQueryBuilder('device')

@@ -6,6 +6,9 @@ var socialRepository;
 
 class SocialRepository {
     findOneById (id) {    
+        if (!id)
+            return;
+
         return getManager()
             .getRepository(Social)
             .createQueryBuilder('social')

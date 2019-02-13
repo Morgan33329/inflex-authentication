@@ -26,31 +26,12 @@ import Social from './mongoose/models/social';
  */
 
 class Mongoose {
-    checkConfig (cnf) {
-        if (cnf.manualConnect)
-            return;
-
-        if (!cnf.host) {
-            console.error('Missing host from mongodb database config database');
-            process.exit();
-        }
-    }
-
     getType () {
         return 'mongo';
     }
 
     getId (object) {
         return object._id;
-    }
-
-    connect(settings) {
-        if (cnf.manualConnect)
-            cnf.manualConnect(mongoose.connect);
-        else
-            mongoose.connect(settings.host, { 
-                useNewUrlParser: true 
-            });
     }
 
     repository (type) {

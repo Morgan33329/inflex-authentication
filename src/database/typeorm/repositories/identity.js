@@ -6,6 +6,9 @@ var identityRepository;
 
 class IdentityRepository {
     findOneById (id) {    
+        if (!id)
+            return;
+
         return getManager()
             .createQueryBuilder()
             .select("identity")

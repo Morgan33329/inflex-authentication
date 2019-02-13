@@ -32,58 +32,12 @@ import SocialRepository from './typeorm/repositories/social';
  */
 
 class TypeORM {
-    checkConfig (cnf) {
-        if (cnf.manualConnect)
-            return;
-
-        if (!cnf.username || !cnf.password || !cnf.database) {
-            console.error('Missing data from mongodb database config database');
-            process.exit();
-        }
-    }
-
     getType () {
         return 'typeorm';
     }
 
     getId (object) {
         return object.id;
-    }
-
-    connect (cnf) {
-        let entities = cnf.entities || [];
-
-        entities.push(require('./typeorm/schema/account'));
-        entities.push(require('./typeorm/schema/account'));
-        entities.push(require('./typeorm/schema/device'));
-        entities.push(require('./typeorm/schema/identity'));
-        entities.push(require('./typeorm/schema/password'));
-        entities.push(require('./typeorm/schema/hash'));
-        entities.push(require('./typeorm/schema/social'));
-
-        if (cnf.manualConnect) {
-            cnf.manualConnect(createConnection, entities);
-
-            return;
-        }
-
-        createConnection({
-            type : cnf.type || 'mysql',
-
-            host : cnf.host || 'localhost',
-            port : cnf.port || 3306,
-            username : cnf.username,
-            password : cnf.password,
-            database : cnf.database,
-
-            entitySchemas : entities,
-            entities : entities,
-
-            synchronize : cnf.synchronize || false,
-            logging : cnf.logging || false
-        }).then(connection => {
-            //console.log("TypeORM database connection success");
-        }).catch(error => console.error(error));
     }
 
     repository (type) {

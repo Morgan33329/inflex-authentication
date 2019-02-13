@@ -57,7 +57,9 @@ export default class Token {
                 if (expiredAt > 0)
                     jwtContent["expire"] = Math.round((new Date().getTime() / 1000) + expiredAt);
 
-                return generateJsonWebToken(jwtContent, device)
+                let refreshToken = generateRefreshToken(object.identity);
+
+                return generateJsonWebToken(jwtContent, device, refreshToken)
                     .then(token => {
                         var disable = new DeviceDisableService();
 
@@ -89,7 +91,7 @@ export default class Token {
         return null;
     }
 
-    refresh (token, refreshToken, expire) {
+    refresh (token, refreshToken, expire = 0, newRefreshToken = false) {
         token = token
             .replace(tokenType, "")
             .replace(" ", "");
@@ -102,33 +104,43 @@ export default class Token {
             if (decodedToken.iat)
                 delete decodedToken.iat;
 
+            let userData = JSON.parse(decrypt(decodedToken.token_hash));
+
             return database()
                 .repository('device')
-                .findOneById(decodedToken.device)
+                .findOneById(userData.device)
                 .then(device => {
                     if (!device)
                         return Promise.reject("Device not found for this token");
                     else if (device.refresh_token != refreshToken)
-                        return Promise.reject("Invalid refresh token");
+                        return Promise.reject("AAAA Invalid refresh token");
 
                     var expiredAt = expire || 0;
                     
                     if (expiredAt > 0)
                         decodedToken["expire"] = Math.round((new Date().getTime() / 1000) + expiredAt);
 
-                    return generateJsonWebToken(decodedToken, device);
+                    let uploadRefreshToken = newRefreshToken 
+                        ? generateRefreshToken(userData.identity)
+                        : refreshToken;
+
+                    return generateJsonWebToken(decodedToken, device, uploadRefreshToken)
+                        .then(token => {
+                            if (!newRefreshToken)
+                                token.refresh_token = refreshToken;
+
+                            return token;
+                        });
                 });
         } else
             return Promise.reject("Invalid token");
     }
 }
 
-function generateJsonWebToken (jwtContent, device) {
+function generateJsonWebToken (jwtContent, device, refreshToken) {
     let log = getConfig('log'),
     
         jwtKey = process.env.JWT_SECRET || 'DqOlYSMMLZCr8JxSffaQ7Kpe7sd9s28M4UjJVyrvHD0GcUSqke1bCYoAXk7EHr1BKxy16xiUi0WEfKsFonxxHJeAwlva0qdN9L4b',
-    
-        refreshToken = generateRefreshToken(jwtContent.identity),
         
         deviceId = database().getId(device);
 

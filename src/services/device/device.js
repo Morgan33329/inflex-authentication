@@ -86,7 +86,7 @@ export default class {
         if (options.language)
             update.device_language = options['language'];
 
-        if (!_.isEmpty(update)) {
+        if (!_.isEmpty(update) && deviceId) {
             return database()
                 .repository('device')
                 .update(deviceId, update)

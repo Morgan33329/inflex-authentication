@@ -6,6 +6,9 @@ var accountRepository;
 
 class AccountRepository {
     findOneById (id) {    
+        if (!id)
+            return;
+
         return getManager()
             .getRepository(Account)
             .createQueryBuilder('account')
@@ -14,14 +17,15 @@ class AccountRepository {
     }
 
     findByAccount (account) { 
+        if (!account)
+            return;
+
         return getManager()
             .getRepository(Account)
             .createQueryBuilder('account')
             .where('account.account = :account', { account : account })
             .getOne()
             .then(many => {
-                console.log(many);
-
                 return many;
             });
     }

@@ -28,6 +28,8 @@ var refreshToken = function (req, res) {
             });
         })
         .catch(err => { 
+            console.error(err);
+
             return res.status(422).json({ 
                 'success' : false,
                 'error' : {

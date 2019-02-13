@@ -65,13 +65,6 @@ export function authExpress (app) {
 
     app.use(passport.initialize());
     app.use(passport.session());
-
-    // Connect to database
-    let db = database(),
-        dbConfig = getConfig('database');
-
-    db.checkConfig(dbConfig);
-    db.connect(dbConfig);
 }
 
 /**

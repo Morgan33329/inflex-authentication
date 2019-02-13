@@ -1,13 +1,14 @@
 {
   "name": "inflex-authentication",
   "main": "./authentication.js",
-  "version": "0.0.52",
+  "version": "0.0.56",
   "author": {
     "name": "Morgan",
     "email": "morgan92333@gmail.com",
     "url": "https://github.com/morgan92333"
   },
   "dependencies": {
+    "@babel/runtime": "^7.1.5",
     "bcrypt": "^2.0.1",
     "bluebird": "^3.5.3",
     "express-validator": "^5.3.0",

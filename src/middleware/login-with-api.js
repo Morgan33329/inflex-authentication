@@ -18,7 +18,7 @@ const defaultSettings = {
 
     'session' : false,
 
-    'invalidAuthenticate' : function(res) {
+    'invalidAuthenticate' : function (res) {
         return res.status(401).json({ 
             'success' : false,
             'error' : {
@@ -30,7 +30,7 @@ const defaultSettings = {
         });
     },
 
-    'invalidRequest' : function(req, res, errors) {
+    'invalidRequest' : function (req, res, errors) {
         return res.status(422).json({ 
             'success' : false,
             'error' : {
@@ -38,6 +38,18 @@ const defaultSettings = {
                 'type' : '',
                 'title' : 'Invalid authorization request',
                 'detail' : 'Invalid authorization request: ' + JSON.stringify(errors)
+            }
+        });
+    },
+
+    'userIsNotActivated' : function (res) {
+        return res.status(401).json({ 
+            'success' : false,
+            'error' : {
+                'code' : '4010103',
+                'type' : '',
+                'title' : 'This user is not activated',
+                'detail' : 'This user is not activated'
             }
         });
     }
@@ -61,7 +73,7 @@ function defineStrategy (settings) {
     passport.use('local-' + settings.version, new Strategy({
         usernameField: settings.usernameField,
         passwordField: settings.passwordField
-    }, (username, password, done) => { console.log(username, password);
+    }, (username, password, done) => {
         byUsernameAndPassword(username, password, done);
     }));
 }
@@ -81,7 +93,7 @@ export default function (options, middleware) {
 
     ret.push(
         function (req, res, next) {
-            return passport.authenticate('local-' + settings.version, function(err, account) {
+            return passport.authenticate('local-' + settings.version, function(err, account, msg) {
                 if (!err && account) {
                     log('Authentication success');
 
@@ -93,7 +105,11 @@ export default function (options, middleware) {
                 } else {
                     log('Authentication failed');
 
-                    settings.invalidAuthenticate(res);
+                    if (msg.code && msg.code == 2) {
+                        settings.userIsNotActivated(res);
+                    } else {
+                        settings.invalidAuthenticate(res);
+                    }
                 }
             })(req, res, next);
         }

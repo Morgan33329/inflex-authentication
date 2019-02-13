@@ -6,6 +6,9 @@ var passwordRepository;
 
 class PasswordRepository {
     findOneById (id) {    
+        if (!id)
+            return;
+
         return getManager()
             .getRepository(Password)
             .createQueryBuilder('password')
@@ -13,7 +16,10 @@ class PasswordRepository {
             .getOne();
     }
 
-    findByPassword (password) {
+    findByPassword (password) { 
+        if (!password)
+            return;
+
         return getManager()
             .getRepository(Password)
             .createQueryBuilder('password')
@@ -22,6 +28,9 @@ class PasswordRepository {
     }
 
     findAllByIdentity (identityId) {
+        if (!identityId)
+            return;
+
         return getManager()
             .getRepository(Password)
             .createQueryBuilder('password')
