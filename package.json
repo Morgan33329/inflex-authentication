@@ -26,9 +26,11 @@
   "deprecated": false,
   "description": "Simple, authentication for Node.js.",
   "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-env": "^1.7.0",
-    "babel-preset-stage-2": "^6.24.1"
+    "@babel/cli": "^7.1.5",
+    "@babel/core": "^7.1.5",
+    "@babel/node": "^7.0.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.5"
   },
   "engines": {},
   "homepage": "https://github.com/morgan92333",
